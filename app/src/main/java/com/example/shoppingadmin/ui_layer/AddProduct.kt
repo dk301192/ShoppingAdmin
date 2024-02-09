@@ -1,13 +1,10 @@
 package com.example.shoppingadmin.UI.ui_layer
 
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -17,15 +14,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
-import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
-import antonkozyriatskyi.circularprogressindicator.CircularProgressIndicator
 import com.denzcoskun.imageslider.models.SlideModel
 import com.example.shoppingadmin.R
-import com.example.shoppingadmin.UI.common.INVISIBLE
 import com.example.shoppingadmin.UI.common.PRODUCT_IMAGES_FOLDER_PATH
-import com.example.shoppingadmin.UI.common.VISIBLE
 import com.example.shoppingadmin.UI.common.uploafImage
 import com.example.shoppingadmin.UI.ui_layer.ProductModels.Adapter.ColorAdapter
 import com.example.shoppingadmin.UI.ui_layer.ProductModels.ProductColor
@@ -34,7 +28,6 @@ import com.example.shoppingadmin.databinding.ActivityAddProductBinding
 import com.github.dhaval2404.colorpicker.MaterialColorPickerDialog
 import com.github.dhaval2404.colorpicker.model.ColorShape
 import com.github.dhaval2404.colorpicker.model.ColorSwatch
-import com.github.dhaval2404.colorpicker.util.setVisibility
 import com.github.guilhe.views.CircularProgressView
 
 class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
@@ -50,10 +43,12 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private var sizes = arrayOf<String?>("S", "M", "L", "XL", "XXL", "XXXL")
     private lateinit var dialog: Dialog
     var product =Products()
+    var percentText : TextView? =null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         circularProgressbar = binding.circularProgressBar
+        percentText = binding.percent
 
         binding.apply {
             addDisplayImg.setOnClickListener {
@@ -81,6 +76,7 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
         val spin = findViewById<Spinner>(R.id.spinner)
         spin.onItemSelectedListener = this@AddProduct
+
 
         // Create the instance of ArrayAdapter
         // having the list of courses
@@ -181,6 +177,7 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     var percentage = (byteTrassferred.toDouble() / tottalBytes) * 100
 
                     circularProgressbar.setProgress(percentage.toFloat())
+                    percentText?.setText("${percentage.toInt()}%")
 
                 })
             showCustomDialog()
@@ -212,6 +209,7 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 //            Toast.LENGTH_LONG
 //        )
 //            .show()
+        (parent!!.getChildAt(0) as TextView).setTextColor(getColor(R.color.gray))
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -224,9 +222,12 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     {
 
         circularProgressbar.visibility = View.VISIBLE
+        percentText?.setVisibility(View.VISIBLE);
     }
     private fun dismissCustomDialog()
     {
-        circularProgressbar.visibility = View.INVISIBLE
+        circularProgressbar.visibility = View.GONE
+        percentText?.setVisibility(View.GONE);
+
     }
 }
