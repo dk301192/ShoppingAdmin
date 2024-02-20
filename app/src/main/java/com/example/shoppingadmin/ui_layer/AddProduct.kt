@@ -1,54 +1,76 @@
-package com.example.shoppingadmin.UI.ui_layer
+package com.example.shoppingadmin.ui_layer.Sheets
 
 import android.app.Dialog
-import android.graphics.Color
 import android.net.Uri
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.denzcoskun.imageslider.models.SlideModel
 import com.example.shoppingadmin.R
-import com.example.shoppingadmin.UI.common.PRODUCT_IMAGES_FOLDER_PATH
-import com.example.shoppingadmin.UI.common.uploafImage
-import com.example.shoppingadmin.UI.ui_layer.ProductModels.Adapter.ColorAdapter
-import com.example.shoppingadmin.UI.ui_layer.ProductModels.ProductColor
-import com.example.shoppingadmin.UI.ui_layer.ProductModels.Products
+import com.example.shoppingadmin.common.PRODUCT_DISPLAY_IMAGES_FOLDER_PATH
+import com.example.shoppingadmin.common.PRODUCT_IMAGES_FOLDER_PATH
+import com.example.shoppingadmin.common.PRODUCT_PATH
+import com.example.shoppingadmin.common.uploadImage
+
+
 import com.example.shoppingadmin.databinding.ActivityAddProductBinding
+import com.example.shoppingadmin.ui_layer.ProductModels.ProductColor
+import com.example.shoppingadmin.ui_layer.ProductModels.Products
+import com.example.shoppingadmin.ui_layer.Sheets.Adapter.ColorAdapter
 import com.github.dhaval2404.colorpicker.MaterialColorPickerDialog
 import com.github.dhaval2404.colorpicker.model.ColorShape
 import com.github.dhaval2404.colorpicker.model.ColorSwatch
-import com.github.guilhe.views.CircularProgressView
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import java.io.Console
 
 class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
-    private lateinit var circularProgressbar: CircularProgressView
     private val binding: ActivityAddProductBinding by lazy {
         ActivityAddProductBinding.inflate(layoutInflater)
     }
+    private lateinit var circularProgressbar: ProgressBar
+    var percentText : TextView? =null
 
     private var imageList = ArrayList<SlideModel>()
     private var colors = arrayListOf<ProductColor>()
     lateinit var colorAdapter: ColorAdapter
     private var colorProduct = ProductColor()
-    private var sizes = arrayOf<String?>("S", "M", "L", "XL", "XXL", "XXXL")
+    private var sizes = arrayListOf("S", "M", "L", "XL", "XXL", "XXXL")
     private lateinit var dialog: Dialog
-    var product =Products()
-    var percentText : TextView? =null
+    var product = Products()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         circularProgressbar = binding.circularProgressBar
         percentText = binding.percent
+
+        with(binding) {
+            multiSelectSpinner.buildCheckedSpinner(sizes){ selectedPositionList, displayString ->
+
+                val tvSelectedPosition = null
+                /* "Selected position:  $selectedPositionList" //if kotlin, python selecteed:returned postion will be 0,2
+                 val tvDispString
+                 tvDispString.text = "Display String:  $displayString"*/
+                if(displayString!=null && displayString!="") {
+                    product.productSize = (displayString.split(",").toTypedArray()).toList()
+                }
+
+            }
+        }
 
         binding.apply {
             addDisplayImg.setOnClickListener {
@@ -63,37 +85,47 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             addProductColors.setOnClickListener {
                 showColorPicker()
             }
-            saveProduct.setOnClickListener {
-                Toast.makeText(
-                    applicationContext, "Save Item Successfully!",
-                    Toast.LENGTH_LONG
-                )
-                    .show()
+
+            showDialog()
+
+            binding.saveProduct.setOnClickListener {
+
+                product.productName= binding.productName.text.toString().trim()
+                product.productPrice= binding.productPrice.text.toString().trim().toLong()
+                product.productDes= binding.productDisp.text.toString().trim()
+                product.productDiscountPercent= binding.productDiscount.text.toString().trim().toLong()
+                product.productColor=colors
+
+                Log.d("PRODUCT", "onCreate: $product")
+                FirebaseFirestore.getInstance().collection(PRODUCT_PATH).document().set(product).addOnCompleteListener {
+                    if (it.isSuccessful){
+                        Toast.makeText(this@AddProduct, "Product added SucessFully . . . ", Toast.LENGTH_SHORT).show()
+                    }else{
+                        Toast.makeText(this@AddProduct, "${it.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
+
+                        Log.d("Failed", "onCreate: ${it.exception?.localizedMessage}")
+                    }
+                }
 
             }
-            showDialog()
         }
 
-        val spin = findViewById<Spinner>(R.id.spinner)
-        spin.onItemSelectedListener = this@AddProduct
 
+       // val spin = findViewById<Spinner>(R.id.spinner)
+      //  spin.onItemSelectedListener = this@AddProduct
 
         // Create the instance of ArrayAdapter
         // having the list of courses
-        val ad: ArrayAdapter<*> = ArrayAdapter<Any?>(
+       /* val ad: ArrayAdapter<*> = ArrayAdapter<Any?>(
             this,
             android.R.layout.simple_spinner_item,
-            sizes
+            sizes as List<Any?>
         )
 
         ad.setDropDownViewResource(
             android.R.layout.simple_spinner_dropdown_item
         )
-        spin.adapter = ad
-
-        binding.saveProduct.setOnClickListener {
-            product.productDisplayImage
-        }
+        spin.adapter = ad*/
 
     }
 
@@ -154,52 +186,73 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         // photo picker.
         if (uri != null) {
             showCustomDialog()
-            circularProgressbar.setProgress(0.0F)
-            uploafImage(PRODUCT_IMAGES_FOLDER_PATH,uri,
-                {result:Boolean,fileUrl:String->
+            circularProgressbar.setProgress(0,true)
 
-                    if(result){
-                        product.productDisplayImage=fileUrl
-                        binding.showDisplayImg.setImageURI(uri)
-                        binding.showDisplayImg.visibility = View.VISIBLE
-                        Toast.makeText(this, "Image found Successfully!", Toast.LENGTH_SHORT).show()
-                        dismissCustomDialog()
+            uploadImage(PRODUCT_IMAGES_FOLDER_PATH, uri, { it, imageUrl ->
+                if (it) {
+                    product.productDisplayImage = imageUrl
+                    binding.showDisplayImg.setImageURI(uri)
+                    //  product.productDisplayImages
+                    binding.showDisplayImg.visibility = View.VISIBLE
+                    dismissCustomDialog()
 
-                    }
-                    else
-                    {
-                        Toast.makeText(this, "Image Not found !", Toast.LENGTH_SHORT).show()
-                        dismissCustomDialog()
-                    }
-                    println("")
-                },
-                {byteTrassferred:Long,tottalBytes:Long->
-                    var percentage = (byteTrassferred.toDouble() / tottalBytes) * 100
+                    Toast.makeText(this, "Image found Successfully!", Toast.LENGTH_SHORT).show()
+                } else {
+                    dismissCustomDialog()
 
-                    circularProgressbar.setProgress(percentage.toFloat())
-                    percentText?.setText("${percentage.toInt()}%")
+                    Toast.makeText(this, "Image Not found !", Toast.LENGTH_SHORT).show()
 
-                })
-            showCustomDialog()
+                }
+            },{
+                    byteTrassferred:Long,tottalBytes:Long->
+                var percentage = (byteTrassferred.toDouble() / tottalBytes) * 100
+
+                circularProgressbar.setProgress(percentage.toInt(),true)
+                percentText?.text = "${percentage.toInt()}%"
+
+            })
 
         } else {
+            dismissCustomDialog()
 
             Toast.makeText(this, "Image Not found !", Toast.LENGTH_SHORT).show()
-            dismissCustomDialog()
         }
     }
 
     // Registers a photo picker activity launcher in single-select mode.
-    val pickMedia2 = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+    val pickMedia2 = registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uri ->
         // Callback is invoked after the user selects a media item or closes the
         // photo picker.
-        if (uri != null) {
-            addImgInList(uri)
-            binding.imageSlider.visibility = View.VISIBLE
-            Toast.makeText(this, "Image found Successfully!", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "Image Not found !", Toast.LENGTH_SHORT).show()
+        uri.forEach {
+                uri->
+            circularProgressbar.progress = 0
+            showCustomDialog()
+
+            uploadImage(PRODUCT_DISPLAY_IMAGES_FOLDER_PATH, uri,{ it, imageUrl ->
+                if (it) {
+
+                    addImgInList(uri)
+                    product.productDisplayImages?.add(imageUrl)
+                    binding.imageSlider.visibility = View.VISIBLE
+                    Toast.makeText(this, "Image found Successfully!", Toast.LENGTH_SHORT).show()
+                    dismissCustomDialog()
+                } else {
+                    dismissCustomDialog()
+                    Toast.makeText(this, "Image Not found !", Toast.LENGTH_SHORT).show()
+
+                }
+            },
+                {
+                        byteTrassferred:Long,tottalBytes:Long->
+                    var percentage = (byteTrassferred.toDouble() / tottalBytes) * 100
+
+                    circularProgressbar.progress = percentage.toInt()
+                    percentText?.text = "${percentage.toInt()}%"
+
+                })
+
         }
+
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -209,25 +262,22 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 //            Toast.LENGTH_LONG
 //        )
 //            .show()
-        (parent!!.getChildAt(0) as TextView).setTextColor(getColor(R.color.gray))
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
 
     }
 
-
-
     private fun showCustomDialog()
     {
 
         circularProgressbar.visibility = View.VISIBLE
-        percentText?.setVisibility(View.VISIBLE);
+        percentText?.visibility = View.VISIBLE
     }
     private fun dismissCustomDialog()
     {
         circularProgressbar.visibility = View.GONE
-        percentText?.setVisibility(View.GONE);
+        percentText?.visibility = View.GONE
 
     }
 }

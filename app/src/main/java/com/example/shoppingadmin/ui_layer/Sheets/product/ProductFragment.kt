@@ -7,8 +7,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.shoppingadmin.UI.ui_layer.AddProduct
 import com.example.shoppingadmin.databinding.FragmentProductBinding
+import com.example.shoppingadmin.ui_layer.Sheets.AddProduct
 
 class ProductFragment : Fragment() {
     private lateinit var binding:FragmentProductBinding

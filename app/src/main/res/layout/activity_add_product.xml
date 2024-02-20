@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     android:id="@+id/constraintlayout"
-    tools:context=".UI.ui_layer.AddProduct">
+    tools:context="ui_layer.Sheets.AddProduct">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView2"
@@ -18,7 +18,6 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -56,7 +55,7 @@
             <TextView
                 android:id="@+id/addSubImg"
                 android:layout_width="wrap_content"
-                android:layout_height="59dp"
+                android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
@@ -86,6 +85,7 @@
 
 
             <EditText
+                android:id="@+id/product_name"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="10dp"
@@ -93,22 +93,20 @@
                 android:fontFamily="@font/cantarell"
                 android:hint="@string/enter_product_name"
                 android:inputType="text"
-                android:textColorHint="@color/gray"
                 android:paddingStart="5dp"
                 android:textColor="@color/appColor"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <EditText
+                android:id="@+id/product_price"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:textColorHint="@color/gray"
-
                 android:layout_marginTop="10dp"
                 android:background="@drawable/shape"
                 android:fontFamily="@font/cantarell"
                 android:hint="Enter Product Price"
-                android:inputType="text"
+                android:inputType="number"
                 android:paddingStart="5dp"
                 android:textColor="@color/appColor"
                 android:textSize="18sp"
@@ -116,17 +114,16 @@
 
 
             <EditText
+                android:id="@+id/product_disp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="50dp"
-                android:maxLines="10"
-                android:textColorHint="@color/gray"
-
-                android:maxHeight="300dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/shape"
                 android:fontFamily="@font/cantarell"
                 android:hint="@string/enter_product_description"
+                android:maxHeight="300dp"
+                android:maxLines="10"
+                android:minHeight="50dp"
                 android:paddingStart="5dp"
                 android:textColor="@color/appColor"
                 android:textSize="18sp"
@@ -134,31 +131,37 @@
                 tools:ignore="RtlSymmetry" />
 
             <EditText
+                android:id="@+id/product_discount"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/shape"
                 android:fontFamily="@font/cantarell"
                 android:hint="@string/enter_discount"
-                android:inputType="text"
-                android:textColorHint="@color/gray"
-
+                android:inputType="number"
                 android:paddingStart="5dp"
                 android:textColor="@color/appColor"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 tools:ignore="RtlSymmetry" />
 
-                <Spinner
-                    android:id="@+id/spinner"
-                    android:layout_width="wrap_content"
-                    android:textColorHint="@color/gray"
-                    android:background="@drawable/shape"
-                    android:layout_marginTop="10dp"
-                    android:layout_height="50dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+           <!-- <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="wrap_content"
+                android:background="@drawable/shape"
+                android:layout_marginTop="10dp"
+                android:layout_height="50dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />-->
+            <com.puskal.multiselectspinner.MultiSelectSpinnerView
+                android:id="@+id/multiSelectSpinner"
+                android:layout_marginTop="10dp"
 
+                android:background="@drawable/shape"
+                app:placeholder_text="Select Size"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                />
             <TextView
                 android:id="@+id/addProductColors"
                 android:layout_width="match_parent"
@@ -203,15 +206,13 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <com.github.guilhe.views.CircularProgressView
+    <ProgressBar
         android:id="@+id/circularProgressBar"
-
+        style="@style/CircularDeterminateProgressBar"
+        android:progress="0"
         android:layout_width="130dp"
         android:layout_height="130dp"
-        app:progress="0"
         android:visibility="invisible"
-        app:progressBarThickness="10dp"
-        app:progressBarColor="@color/appColor"
         app:layout_constraintEnd_toEndOf="@+id/constraintlayout"
         app:layout_constraintStart_toStartOf="@+id/constraintlayout"
         app:layout_constraintTop_toTopOf="@+id/constraintlayout" />

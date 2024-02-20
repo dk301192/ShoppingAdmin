@@ -1,4 +1,3 @@
-val LATEST_VERSION: String="2.0.0"
 
 plugins {
     id("com.android.application")
@@ -59,6 +58,7 @@ dependencies {
 
     implementation("com.google.firebase:firebase-storage")
     implementation("com.android.support:support-annotations:28.0.0")
+    implementation("com.google.firebase:firebase-firestore:24.10.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -69,8 +69,8 @@ dependencies {
 
     implementation ("com.github.Dhaval2404:ColorPicker:2.3")
     implementation ("io.github.marwa-eltayeb:progressdialog:1.0.0")
-    implementation ("com.github.antonKozyriatskyi:CircularProgressIndicator:1.3.0")
-    implementation ("com.github.guilhe:circular-progress-view:${LATEST_VERSION}")
+    implementation ("com.github.puskal-khadka:MultiSelectSpinner:1.0.1")
+
 
 
 }

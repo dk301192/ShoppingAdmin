@@ -1,10 +1,10 @@
-package com.example.shoppingadmin.UI.ui_layer.ProductModels.Adapter
+package com.example.shoppingadmin.ui_layer.Sheets.Adapter
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.shoppingadmin.UI.ui_layer.ProductModels.ProductColor
+import com.example.shoppingadmin.ui_layer.ProductModels.ProductColor
 import com.example.shoppingadmin.databinding.ColorItemBinding
 
 class ColorAdapter(var colorList: ArrayList<ProductColor>, var context: Context) :
