@@ -145,14 +145,31 @@
                 android:textStyle="bold"
                 tools:ignore="RtlSymmetry" />
 
-           <!-- <Spinner
-                android:id="@+id/spinner"
-                android:layout_width="wrap_content"
-                android:background="@drawable/shape"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
                 android:layout_marginTop="10dp"
-                android:layout_height="50dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />-->
+
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:gravity="center"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="18sp"
+                    android:layout_marginRight="10dp"
+                    android:text="Select Category"
+                    />
+                <Spinner
+                    android:id="@+id/spinner"
+
+                    android:layout_width="wrap_content"
+                    android:background="@drawable/shape"
+                    android:layout_height="50dp"
+
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </LinearLayout>
             <com.puskal.multiselectspinner.MultiSelectSpinnerView
                 android:id="@+id/multiSelectSpinner"
                 android:layout_marginTop="10dp"
@@ -217,6 +234,17 @@
         app:layout_constraintStart_toStartOf="@+id/constraintlayout"
         app:layout_constraintTop_toTopOf="@+id/constraintlayout" />
 
+    <ProgressBar
+        android:id="@+id/saveProductProgressBar"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:progressDrawable="@drawable/progressbar_img"
+
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <TextView
         android:id="@+id/percent"
         android:layout_width="wrap_content"

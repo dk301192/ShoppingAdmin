@@ -39,3 +39,11 @@ fun uploadImage(
 
 
 }
+sealed class Category(var name:String)
+{
+ object dress : Category("dress")
+ object jump_suit :Category("Jump Suit")
+ object shirt : Category("Shirt")
+ object bottoms : Category("Bottoms")
+ object tops : Category("Tops")
+}

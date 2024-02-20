@@ -20,6 +20,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.denzcoskun.imageslider.models.SlideModel
 import com.example.shoppingadmin.R
+import com.example.shoppingadmin.common.Category
 import com.example.shoppingadmin.common.PRODUCT_DISPLAY_IMAGES_FOLDER_PATH
 import com.example.shoppingadmin.common.PRODUCT_IMAGES_FOLDER_PATH
 import com.example.shoppingadmin.common.PRODUCT_PATH
@@ -33,16 +34,20 @@ import com.example.shoppingadmin.ui_layer.Sheets.Adapter.ColorAdapter
 import com.github.dhaval2404.colorpicker.MaterialColorPickerDialog
 import com.github.dhaval2404.colorpicker.model.ColorShape
 import com.github.dhaval2404.colorpicker.model.ColorSwatch
+import com.github.dhaval2404.colorpicker.util.setVisibility
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.io.Console
 
 class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
+    private val categoriesList = ArrayList<String>()
     private val binding: ActivityAddProductBinding by lazy {
         ActivityAddProductBinding.inflate(layoutInflater)
     }
     private lateinit var circularProgressbar: ProgressBar
+
+    private lateinit var saveProductProgressBar: ProgressBar
     var percentText : TextView? =null
 
     private var imageList = ArrayList<SlideModel>()
@@ -52,26 +57,17 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private var sizes = arrayListOf("S", "M", "L", "XL", "XXL", "XXXL")
     private lateinit var dialog: Dialog
     var product = Products()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         circularProgressbar = binding.circularProgressBar
+        saveProductProgressBar = binding.saveProductProgressBar
+
         percentText = binding.percent
-
-        with(binding) {
-            multiSelectSpinner.buildCheckedSpinner(sizes){ selectedPositionList, displayString ->
-
-                val tvSelectedPosition = null
-                /* "Selected position:  $selectedPositionList" //if kotlin, python selecteed:returned postion will be 0,2
-                 val tvDispString
-                 tvDispString.text = "Display String:  $displayString"*/
-                if(displayString!=null && displayString!="") {
-                    product.productSize = (displayString.split(",").toTypedArray()).toList()
-                }
-
-            }
-        }
-
+         setCategoryList()
+         setCategoryDropdown()
+         setMulipleSizeSelectionDropDown()
         binding.apply {
             addDisplayImg.setOnClickListener {
                 // Launch the photo picker and let the user choose only images.
@@ -89,18 +85,22 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             showDialog()
 
             binding.saveProduct.setOnClickListener {
-
+                saveProductProgressBar.setVisibility(View.VISIBLE)
                 product.productName= binding.productName.text.toString().trim()
                 product.productPrice= binding.productPrice.text.toString().trim().toLong()
                 product.productDes= binding.productDisp.text.toString().trim()
                 product.productDiscountPercent= binding.productDiscount.text.toString().trim().toLong()
                 product.productColor=colors
+                product.addedTimeStamp=System.currentTimeMillis()
 
                 Log.d("PRODUCT", "onCreate: $product")
                 FirebaseFirestore.getInstance().collection(PRODUCT_PATH).document().set(product).addOnCompleteListener {
                     if (it.isSuccessful){
+                        saveProductProgressBar.setVisibility(View.GONE)
                         Toast.makeText(this@AddProduct, "Product added SucessFully . . . ", Toast.LENGTH_SHORT).show()
                     }else{
+                        saveProductProgressBar.setVisibility(View.GONE)
+
                         Toast.makeText(this@AddProduct, "${it.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
 
                         Log.d("Failed", "onCreate: ${it.exception?.localizedMessage}")
@@ -111,23 +111,46 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         }
 
 
-       // val spin = findViewById<Spinner>(R.id.spinner)
-      //  spin.onItemSelectedListener = this@AddProduct
+
+    }
+
+    private fun setMulipleSizeSelectionDropDown() {
+        with(binding) {
+            multiSelectSpinner.buildCheckedSpinner(sizes){ selectedPositionList, displayString ->
+
+                if(displayString!=null && displayString!="") {
+                    product.productSize = (displayString.split(",").toTypedArray()).toList()
+                }
+
+            }
+        }    }
+
+    private fun setCategoryList()  {
+        categoriesList!!.add(Category.dress.name)
+        categoriesList!!.add(Category.jump_suit.name)
+        categoriesList!!.add(Category.bottoms.name)
+        categoriesList!!.add((Category.tops.name))
+        categoriesList!!.add(Category.shirt.name)
+
+    }
+
+    private fun setCategoryDropdown() {
+
+          val spin = findViewById<Spinner>(R.id.spinner)
+          spin.onItemSelectedListener = this@AddProduct
 
         // Create the instance of ArrayAdapter
         // having the list of courses
-       /* val ad: ArrayAdapter<*> = ArrayAdapter<Any?>(
-            this,
-            android.R.layout.simple_spinner_item,
-            sizes as List<Any?>
-        )
+         val ad: ArrayAdapter<*> = ArrayAdapter<Any?>(
+             this,
+             android.R.layout.simple_spinner_item,
+             categoriesList as List<Any?>
+         )
 
-        ad.setDropDownViewResource(
-            android.R.layout.simple_spinner_dropdown_item
-        )
-        spin.adapter = ad*/
-
-    }
+         ad.setDropDownViewResource(
+             android.R.layout.simple_spinner_dropdown_item
+         )
+         spin.adapter = ad    }
 
     private fun showDialog() {
         dialog = Dialog(this@AddProduct)
