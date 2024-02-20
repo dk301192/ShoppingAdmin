@@ -70,7 +70,7 @@ dependencies {
     implementation ("com.github.Dhaval2404:ColorPicker:2.3")
     implementation ("io.github.marwa-eltayeb:progressdialog:1.0.0")
     implementation ("com.github.puskal-khadka:MultiSelectSpinner:1.0.1")
+    implementation ("com.github.ahmmedrejowan.CuteToast:CuteToast:1.2")
+    }
 
 
-
-}

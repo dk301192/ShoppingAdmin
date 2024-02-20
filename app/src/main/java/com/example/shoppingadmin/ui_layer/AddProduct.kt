@@ -38,6 +38,7 @@ import com.github.dhaval2404.colorpicker.util.setVisibility
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.rejowan.cutetoast.CuteToast
 import java.io.Console
 
 class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
@@ -92,18 +93,24 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 product.productDiscountPercent= binding.productDiscount.text.toString().trim().toLong()
                 product.productColor=colors
                 product.addedTimeStamp=System.currentTimeMillis()
+                product.category=spinner.selectedItem.toString()
+
+
 
                 Log.d("PRODUCT", "onCreate: $product")
                 FirebaseFirestore.getInstance().collection(PRODUCT_PATH).document().set(product).addOnCompleteListener {
                     if (it.isSuccessful){
                         saveProductProgressBar.setVisibility(View.GONE)
-                        Toast.makeText(this@AddProduct, "Product added SucessFully . . . ", Toast.LENGTH_SHORT).show()
+
+                        CuteToast.ct(this@AddProduct, "Product added SucessFully . . . ", CuteToast.LENGTH_SHORT, CuteToast.HAPPY, true).show();
+                       // Toast.makeText(this@AddProduct, "Product added SucessFully . . . ", Toast.LENGTH_SHORT).show()
                     }else{
                         saveProductProgressBar.setVisibility(View.GONE)
+                        CuteToast.ct(this@AddProduct, "${it.exception?.localizedMessage}", CuteToast.LENGTH_SHORT, CuteToast.ERROR, true).show();
 
-                        Toast.makeText(this@AddProduct, "${it.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(this@AddProduct, "${it.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
 
-                        Log.d("Failed", "onCreate: ${it.exception?.localizedMessage}")
+                       // Log.d("Failed", "onCreate: ${it.exception?.localizedMessage}")
                     }
                 }
 
@@ -218,12 +225,14 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     //  product.productDisplayImages
                     binding.showDisplayImg.visibility = View.VISIBLE
                     dismissCustomDialog()
+                    CuteToast.ct(this@AddProduct, "Image found Successfully! ", CuteToast.LENGTH_SHORT, CuteToast.HAPPY, true).show();
 
-                    Toast.makeText(this, "Image found Successfully!", Toast.LENGTH_SHORT).show()
+                  //  Toast.makeText(this, "Image found Successfully!", Toast.LENGTH_SHORT).show()
                 } else {
                     dismissCustomDialog()
+                    CuteToast.ct(this@AddProduct, "Image not Successfully! ", CuteToast.LENGTH_SHORT, CuteToast.SAD, true).show();
 
-                    Toast.makeText(this, "Image Not found !", Toast.LENGTH_SHORT).show()
+                   // Toast.makeText(this, "Image Not found !", Toast.LENGTH_SHORT).show()
 
                 }
             },{
@@ -237,8 +246,9 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
         } else {
             dismissCustomDialog()
+            CuteToast.ct(this@AddProduct, "Image not found! ", CuteToast.LENGTH_SHORT, CuteToast.HAPPY, true).show();
 
-            Toast.makeText(this, "Image Not found !", Toast.LENGTH_SHORT).show()
+           // Toast.makeText(this, "Image Not found !", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -257,11 +267,15 @@ class AddProduct : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     addImgInList(uri)
                     product.productDisplayImages?.add(imageUrl)
                     binding.imageSlider.visibility = View.VISIBLE
-                    Toast.makeText(this, "Image found Successfully!", Toast.LENGTH_SHORT).show()
+                    CuteToast.ct(this@AddProduct, "Image found Successfully! ", CuteToast.LENGTH_SHORT, CuteToast.HAPPY, true).show();
+
+                    // Toast.makeText(this, "Image found Successfully!", Toast.LENGTH_SHORT).show()
                     dismissCustomDialog()
                 } else {
                     dismissCustomDialog()
-                    Toast.makeText(this, "Image Not found !", Toast.LENGTH_SHORT).show()
+                    CuteToast.ct(this@AddProduct, "Image not founr! ", CuteToast.LENGTH_SHORT, CuteToast.HAPPY, true).show();
+
+                    //Toast.makeText(this, "Image Not found !", Toast.LENGTH_SHORT).show()
 
                 }
             },
